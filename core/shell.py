@@ -1,4 +1,5 @@
 """Persistent interactive shell management for Agent-OS."""
+
 from __future__ import annotations
 
 import asyncio
@@ -11,7 +12,11 @@ import pexpect
 class InteractiveShell:
     """Maintain a long-running shell session with asynchronous access."""
 
-    def __init__(self, shell_type: str = "bash", prompt: str = "AGENT_OS> ") -> None:
+    def __init__(
+        self,
+        shell_type: str = "bash",
+        prompt: str = "AGENT_OS> ",
+    ) -> None:
         self.shell_type = shell_type
         self.prompt = prompt
         self.process: Optional[pexpect.spawn] = None
@@ -31,7 +36,9 @@ class InteractiveShell:
             cwd=self.cwd,
         )
 
-        await asyncio.to_thread(self.process.sendline, f'export PS1="{self.prompt}"')
+        await asyncio.to_thread(
+            self.process.sendline, f'export PS1="{self.prompt}"'
+        )
         await asyncio.to_thread(self.process.expect_exact, self.prompt)
 
     async def execute(self, command: str) -> AsyncIterator[str]:

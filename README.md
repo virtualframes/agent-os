@@ -19,6 +19,22 @@ All components are asyncio-native, enabling responsive text UIs and agent
 pipelines. Install dependencies with `pip install pexpect` (plus any
 language runtimes you wish to execute).
 
+## Core System Scaffolding
+
+The repository now includes skeleton implementations for the long-lived
+components referenced in the Agent-OS specification:
+
+* `core/quantum_router.py` – adaptive routing logic that selects the best agent
+  for a command while emitting audit events via the shared logger.
+* `core/graph_engine.py` – deterministic, color-aware spacetime graph builder
+  backed by in-memory Neo4j and vector store adapters.
+* `core/terminal_engine.py` – Textual-based UI scaffold that wires the router
+  and graph together. It degrades gracefully when Textual is not installed.
+* `db/` – lightweight stand-ins for the audit log, Neo4j adapter, and vector
+  store APIs so higher layers can be developed without external services.
+* `integrations/xbow_scanner.py` – placeholder HackerOne integration that keeps
+  the interface stable for future vulnerability ingestion.
+
 ## Audit & Compliance Services
 
 Agent-OS now ships with an append-only audit pipeline to satisfy the
@@ -35,3 +51,12 @@ Agent-OS now ships with an append-only audit pipeline to satisfy the
 
 Both components rely on the shared `common.protocol.Event` definitions, making
 the audit rail contractually identical across services.
+
+## Dependencies
+
+Local development now requires `numpy` for the vector store utilities and
+`textual` to render the optional terminal UI. Install extras with:
+
+```bash
+pip install numpy textual
+```

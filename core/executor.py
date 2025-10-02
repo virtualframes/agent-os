@@ -5,6 +5,7 @@ code in a variety of languages. Execution happens inside a pseudo-terminal
 (PTY) so the behaviour mirrors an interactive terminal session. Output is
 streamed back to the caller to support responsive user interfaces.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -130,7 +131,9 @@ class LanguageExecutor:
 
             # Send any provided stdin once the process has started.
             if stdin:
-                await asyncio.to_thread(os.write, master_fd, stdin.encode("utf-8"))
+                await asyncio.to_thread(
+                    os.write, master_fd, stdin.encode("utf-8")
+                )
 
             try:
                 async for chunk in self._stream_from_fd(master_fd, proc):
@@ -169,7 +172,9 @@ class LanguageExecutor:
                 # Drain any remaining data before exiting the loop.
                 while True:
                     try:
-                        data = await asyncio.to_thread(os.read, master_fd, 1024)
+                        data = await asyncio.to_thread(
+                            os.read, master_fd, 1024
+                        )
                     except OSError:
                         data = b""
                     if not data:
@@ -204,15 +209,21 @@ class LanguageExecutor:
         if language == "rust":
             output_path = self._output_path(source_path)
             compile_cmd = ["rustc", source_path, "-o", output_path]
-            return f"{self._quote_args(compile_cmd)} && {shlex.quote(output_path)}"
+            quoted = self._quote_args(compile_cmd)
+            return f"{quoted} && {shlex.quote(output_path)}"
 
         if isinstance(command, str):
-            return command.format(file=source_path, output=self._output_path(source_path))
+            return command.format(
+                file=source_path, output=self._output_path(source_path)
+            )
 
         formatted: List[str] = []
         for part in command:
             formatted.append(
-                part.format(file=source_path, output=self._output_path(source_path))
+                part.format(
+                    file=source_path,
+                    output=self._output_path(source_path),
+                )
             )
 
         formatted.append(source_path)
