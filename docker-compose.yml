@@ -1,0 +1,80 @@
+# Docker Compose for Agent-OS Local Development Environment
+# This file defines the multi-container setup for local testing,
+# simulating the distributed production environment.
+
+version: '3.8'
+
+services:
+  # The Nervous System: NATS Message Bus
+  nats:
+    image: nats:2.9
+    ports:
+      - "4222:4222" # Client port
+      - "8222:8222" # Monitoring port
+    command: "-js" # Enable JetStream for message persistence
+    healthcheck:
+      test: ["CMD", "nats", "server", "check", "jsz"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  # Database for Token Optimizer
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: agentos
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: token_optimizer_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentos -d token_optimizer_db"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  # API Gateway: The entrypoint for the terminal
+  api_gateway:
+    build:
+      context: ./api_gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - NATS_URL=nats://nats:4222
+      - TOKEN_OPTIMIZER_URL=http://token_optimizer:8001
+    depends_on:
+      nats:
+        condition: service_healthy
+      token_optimizer:
+        condition: service_healthy
+    restart: on-failure
+
+  # Token Optimizer Service
+  token_optimizer:
+    build:
+      context: ./token_optimizer
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=postgresql://agentos:password@postgres/token_optimizer_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: on-failure
+
+  # Jules Agent Prototype
+  jules_agent_1:
+    build:
+      context: ./agents/jules_prototype
+    environment:
+      - NATS_URL=nats://nats:4222
+      - AGENT_ID=jules-01
+    depends_on:
+      nats:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  postgres_data:
