@@ -1,0 +1,17 @@
+{
+  "name": "gateway",
+  "version": "1.0.0",
+  "description": "API Gateway for Terminal Nexus",
+  "main": "server.js",
+  "scripts": {
+    "dev": "fastify start -l info -w server.js",
+    "start": "fastify start -l info server.js"
+  },
+  "dependencies": {
+    "fastify": "^4.0.0",
+    "fastify-cli": "^6.0.0",
+    "node-fetch": "^3.0.0"
+  },
+  "author": "",
+  "license": "ISC"
+}

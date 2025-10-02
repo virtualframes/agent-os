@@ -1,0 +1,8 @@
+textual
+httpx
+anthropic
+google-api-python-client
+google-auth-oauthlib
+uvicorn
+fastapi
+pydantic
