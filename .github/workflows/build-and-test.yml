@@ -1,0 +1,46 @@
+name: Linting and Testing
+
+on:
+  pull_request:
+    branches: [ main, work ]
+  push:
+    branches: [ main, work ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29
+        with:
+          fetch-depth: 0
+
+      - name: Check for merge conflicts
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          if ! git merge-tree $(git merge-base HEAD origin/${{ github.base_ref }}) HEAD origin/${{ github.base_ref }} | grep -q "<<<<<"; then
+            echo "✅ No merge conflicts detected"
+          else
+            echo "❌ Merge conflicts detected with base branch"
+            echo "Please resolve conflicts before merging"
+            exit 1
+          fi
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@88014a737593739987e9f3d0322b72445694d457
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 black pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Lint with flake8 and black
+        run: make lint
+
+      - name: Test with pytest
+        run: make test
