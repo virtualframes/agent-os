@@ -10,8 +10,10 @@ code directly from the Agent-OS terminal interface:
   The legacy `core/executor.py` facade now routes requests to the registry of
   dedicated executors.
 * `core/shells/` – discrete implementations for each supported interactive
-  shell (`bash`, `zsh`, etc.) managed via a lightweight `ShellManager`. The
-  former `InteractiveShell` class is now a compatibility wrapper.
+  shell (`bash`, `zsh`, etc.) managed via a lightweight `ShellManager`. When a
+  shell name is requested that is not pre-registered, the generic shell
+  adapter falls back to executing the provided command directly. The former
+  `InteractiveShell` class is now a compatibility wrapper.
 * `core/repls/` – modular, per-language REPL implementations with a
   high-level `REPLManager` exposed from `core/repl.py`.
 

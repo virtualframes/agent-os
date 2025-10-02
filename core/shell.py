@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import AsyncIterator, Dict, Type
 
-from .shells import BaseShell, BashShell, ShellManager, ZshShell
+from .shells import BaseShell, BashShell, GenericShell, ShellManager, ZshShell
 
 
 _SHELL_TYPES: Dict[str, Type[BaseShell]] = {
@@ -20,8 +20,9 @@ class InteractiveShell:
         self.prompt = prompt
         shell_cls = _SHELL_TYPES.get(shell_type.lower())
         if shell_cls is None:
-            raise ValueError(f"Unsupported shell type '{shell_type}'")
-        self._shell = shell_cls(prompt=prompt)
+            self._shell = GenericShell(command=shell_type, prompt=prompt)
+        else:
+            self._shell = shell_cls(prompt=prompt)
 
     async def start(self) -> None:
         await self._shell.start()
@@ -38,4 +39,11 @@ class InteractiveShell:
         return self._shell.session_id
 
 
-__all__ = ["InteractiveShell", "ShellManager", "BaseShell", "BashShell", "ZshShell"]
+__all__ = [
+    "InteractiveShell",
+    "ShellManager",
+    "BaseShell",
+    "BashShell",
+    "ZshShell",
+    "GenericShell",
+]

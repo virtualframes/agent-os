@@ -5,6 +5,7 @@ from typing import Dict, Optional, Type
 
 from .base import BaseShell
 from .bash_shell import BashShell
+from .generic_shell import GenericShell
 from .zsh_shell import ZshShell
 
 
@@ -24,9 +25,9 @@ class ShellManager:
     async def create_session(self, shell_type: str = "bash", prompt: str = "AGENT_OS> ") -> BaseShell:
         shell_cls = self._shell_types.get(shell_type.lower())
         if shell_cls is None:
-            raise ValueError(f"Unsupported shell type '{shell_type}'")
-
-        shell = shell_cls(prompt=prompt)
+            shell = GenericShell(command=shell_type, prompt=prompt)
+        else:
+            shell = shell_cls(prompt=prompt)
         await shell.start()
         self._sessions[shell.session_id] = shell
         return shell
