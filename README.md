@@ -18,6 +18,7 @@ code directly from the Agent-OS terminal interface:
 All components are asyncio-native, enabling responsive text UIs and agent
 pipelines. Install dependencies with `pip install pexpect` (plus any
 language runtimes you wish to execute).
+codex/initialize-github-repository-for-agent-os-kimg06
 
 ## Audit & Compliance Services
 
@@ -35,3 +36,5 @@ Agent-OS now ships with an append-only audit pipeline to satisfy the
 
 Both components rely on the shared `common.protocol.Event` definitions, making
 the audit rail contractually identical across services.
+=======
+main
