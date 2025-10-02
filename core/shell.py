@@ -1,4 +1,5 @@
 """Persistent interactive shell management for Agent-OS."""
+
 from __future__ import annotations
 
 import asyncio

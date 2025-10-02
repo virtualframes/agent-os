@@ -5,6 +5,7 @@ code in a variety of languages. Execution happens inside a pseudo-terminal
 (PTY) so the behaviour mirrors an interactive terminal session. Output is
 streamed back to the caller to support responsive user interfaces.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -207,7 +208,9 @@ class LanguageExecutor:
             return f"{self._quote_args(compile_cmd)} && {shlex.quote(output_path)}"
 
         if isinstance(command, str):
-            return command.format(file=source_path, output=self._output_path(source_path))
+            return command.format(
+                file=source_path, output=self._output_path(source_path)
+            )
 
         formatted: List[str] = []
         for part in command:

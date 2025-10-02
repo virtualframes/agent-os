@@ -30,7 +30,9 @@ async def run():
             max_reconnect_attempts=-1,
             name=AGENT_ID,
         )
-        print(f"[{AGENT_ID}] Connected to NATS. Subscribing to '{SUBSCRIBE_SUBJECT}'...")
+        print(
+            f"[{AGENT_ID}] Connected to NATS. Subscribing to '{SUBSCRIBE_SUBJECT}'..."
+        )
     except Exception as e:
         print(f"[{AGENT_ID}] FATAL: Could not connect to NATS. Error: {e}")
         return
@@ -40,7 +42,8 @@ async def run():
         try:
             job = JobRequest.from_bytes(msg.data)
             print(
-                f"[{AGENT_ID}][{job.trace_id}] Received job: {job.job_type.value} on subject {msg.subject}"
+                f"[{AGENT_ID}][{job.trace_id}] Received job: "
+                f"{job.job_type.value} on subject {msg.subject}"
             )
 
             # --- Agent Logic ---

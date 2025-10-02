@@ -77,7 +77,7 @@ async def handle_message(msg: Msg) -> None:
 
     try:
         event = Event.from_bytes(msg.data)
-    except Exception as exc:  # pragma: no cover - defensive logging path
+    except Exception:  # pragma: no cover - defensive logging path
         LOGGER.exception("Failed to decode audit event: subject=%s", msg.subject)
         return
 
