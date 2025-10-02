@@ -5,15 +5,15 @@
 The `core` package now exposes production-ready building blocks for running
 code directly from the Agent-OS terminal interface:
 
-* `core/executor.py` – streams output from subprocesses spawned with PTY
-  support so interactive programs behave exactly like they do in a real
-  terminal. Supports Python, JavaScript/TypeScript, Rust, Go, Bash, Lua,
-  Ruby, and PHP out of the box.
-* `core/shell.py` – maintains a persistent shell session (default `bash`) that
-  keeps environment state between commands, ideal for task runners and
-  long-lived workflows.
-* `core/repl.py` – provides reusable REPL sessions for Python, Node, and Lua
-  so multi-step evaluations can share interpreter state.
+* `core/executors/` – plugin-style executors that isolate runtime specifics
+  per language (Python, JavaScript/TypeScript, Rust, Go, Bash, Lua, Ruby, PHP).
+  The legacy `core/executor.py` facade now routes requests to the registry of
+  dedicated executors.
+* `core/shells/` – discrete implementations for each supported interactive
+  shell (`bash`, `zsh`, etc.) managed via a lightweight `ShellManager`. The
+  former `InteractiveShell` class is now a compatibility wrapper.
+* `core/repls/` – modular, per-language REPL implementations with a
+  high-level `REPLManager` exposed from `core/repl.py`.
 
 All components are asyncio-native, enabling responsive text UIs and agent
 pipelines. Install dependencies with `pip install pexpect` (plus any
