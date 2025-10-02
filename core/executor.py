@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import os
 import pty
+import select
 import shlex
 import shutil
 import subprocess
@@ -175,19 +176,30 @@ class LanguageExecutor:
                     if not data:
                         return
                     yield data.decode("utf-8", errors="replace")
-                return
 
             try:
-                data = await asyncio.wait_for(
-                    asyncio.to_thread(os.read, master_fd, 1024), 0.1
+                ready, _, _ = await asyncio.to_thread(
+                    select.select, [master_fd], [], [], 0.1
                 )
-            except asyncio.TimeoutError:
+            except (OSError, ValueError):
+                ready = []
+
+            if not ready:
                 continue
+
+            try:
+                data = await asyncio.to_thread(os.read, master_fd, 1024)
             except OSError:
                 data = b""
 
             if data:
                 yield data.decode("utf-8", errors="replace")
+            elif proc.poll() is not None:
+                # If the process has finished and the PTY reports EOF we
+                # terminate the stream on the next iteration.
+                continue
+            else:
+                await asyncio.sleep(0)
 
     def _build_command(self, language: str) -> Iterable[str] | str:
         """Return the base command used to execute *language*."""
